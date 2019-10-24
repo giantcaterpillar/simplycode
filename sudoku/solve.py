@@ -13,9 +13,5 @@ if __name__ == '__main__':
     s = Solver()
     s.build_linked_list(raw_matrix)
 
-    while True:
-        cnt = s.pre_solve()
-        if cnt <= 0: break
-
     s.recursive_solve()
     s.print_sudoku_solution()

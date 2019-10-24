@@ -27,7 +27,7 @@ class DancingLinkList():
     def is_completely_empty(self):
         return self.root == self.root.right and self.root == self.root.down
 
-    def select_row(self, cnt):
+    def select_column(self, cnt):
         if cnt <= 0: return None
         
         col_head = self.root.right
@@ -42,7 +42,7 @@ class DancingLinkList():
                 i -= 1
 
             if i == 0 and node.down == col_head:
-                return node.row_head
+                return node.col_head
             
             col_head = col_head.right
         return None

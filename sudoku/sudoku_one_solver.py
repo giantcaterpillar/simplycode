@@ -112,35 +112,22 @@ class Solver():
             print "(%s, %s)-> %s " % (i, j, val+1),
 
 
-    def pre_solve(self):
-        empty_heads = self.dll.get_empty_column_heads()
-        for head in empty_heads:
-            head.remove_column()
-        
-        column_heads = self.dll.get_single_node_column_heads()
+    def select_row(self):
+        priority_rows = set()
+        cnt = 1
+        col_head = self.dll.select_column(cnt)
+        while not col_head:
+            cnt += 1
+            col_head = self.dll.select_column(cnt)
+                
+        node = col_head.down
+        while node != col_head:
+            priority_rows.add(node.row_head)
+            node = node.down
 
-        row_heads = []
-        for head in column_heads:
-            if not head.down.row_head in row_heads:
-                row_heads.append(head.down.row_head)
+        return priority_rows
 
-        columns = []
-        for row_head in row_heads:
-            self.solution.append(row_head)
-            cols = self.dll.get_columns_impacted_by_row(row_head)
-            for col in cols:
-                if not col in columns:
-                    columns.append(col)
-                else:
-                    print "duplicated:", col.val, "by row -->", row_head.val
-            self.dll.remove_column_heads_for_row(row_head)
-            rows = self.dll.get_rows_impacted_by_row(row_head)
-            for row in rows:
-                self.dll.remove_row(row)
-
-        return len(column_heads)
     
-        
     def recursive_solve(self):
         if self.dll.is_completely_empty():
             return True
@@ -148,18 +135,12 @@ class Solver():
         if self.dll.has_column_empty():
             return False
 
-        cnt = 1
-        row_head = self.dll.select_row(cnt)
-        while not row_head:
-            cnt += 1
-            row_head = self.dll.select_row(cnt)
-
-        while True:
-            if row_head == self.dll.root: break
-
+        priority_rows = self.select_row()    
+        while len(priority_rows) > 0:
+            row_head = priority_rows.pop()
             self.solution.append(row_head)
+            
             rows = self.dll.get_rows_impacted_by_row(row_head)
-
             self.dll.remove_column_heads_for_row(row_head)
             for row in rows:
                 self.dll.remove_row(row)
@@ -170,9 +151,6 @@ class Solver():
             self.dll.restore_column_heads_for_row(row_head)
             for row in rows:
                 self.dll.restore_row(row)
-
             self.solution.remove(row_head)
-            row_head = row_head.down
 
         return False
-
